@@ -31,8 +31,9 @@ public class TransactionService {
         recentTransactions.add(now);
         recentTransactions.removeIf(t -> t.isBefore(now.minusSeconds(60)));
         if (recentTransactions.size() > 3) {
-            score += 25;
-            reasons.add("Multiple transactions in short time (+25)");
+            int extra = Math.min((recentTransactions.size() - 3) * 20, 80);
+            score += extra;
+            reasons.add("Multiple transactions in short time (+" + extra + ")");
         }
 
         if (reasons.isEmpty()) {
