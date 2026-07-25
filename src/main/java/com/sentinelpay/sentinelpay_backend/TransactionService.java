@@ -1,5 +1,7 @@
 package com.sentinelpay.sentinelpay_backend;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -14,6 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TransactionService {
 
     private final List<LocalDateTime> recentTransactions = new CopyOnWriteArrayList<>();
+    @Autowired
+    private TransactionRepository transactionRepository;
     private final Map<String, Set<String>> knownDevicesByPayee = new ConcurrentHashMap<>();
 
     public TransactionResponse evaluate(TransactionRequest request) {
@@ -58,6 +62,15 @@ public class TransactionService {
         if (score >= 70) decision = "BLOCKED";
         else if (score >= 40) decision = "FLAGGED";
         else decision = "APPROVED";
+
+        TransactionEntity entity = new TransactionEntity(
+                request.getAmount(),
+                request.getPayee(),
+                score,
+                decision,
+                request.getDeviceFingerprint()
+        );
+        transactionRepository.save(entity);
 
         return new TransactionResponse(request.getAmount(), request.getPayee(), score, decision, reasons);
     }
