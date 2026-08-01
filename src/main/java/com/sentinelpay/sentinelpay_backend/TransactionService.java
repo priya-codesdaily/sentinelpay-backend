@@ -44,9 +44,6 @@ public class TransactionService {
             reasons.add("Multiple transactions in short time (+" + extra + ")");
         }
 
-        if (reasons.isEmpty()) {
-            reasons.add("No risk factors detected");
-        }
         Set<String> knownDevices = knownDevicesByPayee.computeIfAbsent(request.getPayee(), k -> new HashSet<>());
         if (!knownDevices.isEmpty() && !knownDevices.contains(request.getDeviceFingerprint())) {
             score += 20;
